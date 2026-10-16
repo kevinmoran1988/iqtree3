@@ -4148,6 +4148,7 @@ double ModelMixture::optimizeWithEM(double gradient_epsilon) {
 
     // own memory, not phylo_tree's: in edge-linked partition models that memory
     // belongs to all partitions, which may be computed by other threads
+    tree->mem_save_fraction = phylo_tree->mem_save_fraction;
 
     tree->copyPhyloTree(phylo_tree, true);
     tree->optimize_by_newton = phylo_tree->optimize_by_newton;
