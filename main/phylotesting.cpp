@@ -5073,10 +5073,13 @@ void PartitionFinder::getBestModel(int job_type) {
         // sort partition by computational cost for OpenMP/MPI effciency
         for (i = 0; i < closest_pairs.size(); i++) {
             // computation cost is proportional to #sequences, #patterns, and #states
-            Alignment *this_aln = in_tree->at(closest_pairs[i].first)->aln;
-            closest_pairs[i].distance = -((double)this_aln->getNSeq())*this_aln->getNPattern()*this_aln->num_states;
-            this_aln = in_tree->at(closest_pairs[i].second)->aln;
-            closest_pairs[i].distance -= ((double)this_aln->getNSeq())*this_aln->getNPattern()*this_aln->num_states;
+            // summed over the partitions of both subsets
+            closest_pairs[i].distance = 0.0;
+            for (int part : {closest_pairs[i].first, closest_pairs[i].second})
+                for (int gene : gene_sets[part]) {
+                    Alignment *this_aln = in_tree->at(gene)->aln;
+                    closest_pairs[i].distance -= ((double)this_aln->getNSeq())*this_aln->getNPattern()*this_aln->num_states;
+                }
             jobIDs.push_back({i, -closest_pairs[i].distance});
         }
     }
